@@ -1,0 +1,69 @@
+device:
+    gpu: 3
+    n_workers: 16
+
+model:
+    arch: bisenetX39
+    version: cityscapes
+    path: /data01/f.nesti/data/SemanticSegmentation/pretrained/bisenetX39_cityscapes.pth
+    with_bn: True
+   
+data:
+    dataset: cityscapes
+    version: ddrnet_23 #needed for pretrained version
+    train_split: train
+    val_split: val
+    test_split: test
+    img_rows: 1024
+    img_cols: 2048
+    path: /data01/f.nesti/data/SemanticSegmentation/cityscapes/
+    img_norm: True
+    bottom_crop: 0 
+    bgr: False
+    std_version: ddrnet_23
+
+adv_patch:
+    path: 
+        resume: #./exp/22_april_2021/patches/patch_final_11.png # FOR RESUMING OPTIMIZATION
+        out_dir: ./exp/final_woEOT_cityscapes/
+        save_patch: True
+        exp_name: bisenet_600
+    optimization:
+        optimizer:
+            lr: 0.5
+            name: adam
+        loss:
+            adv_loss:
+                name: 'multi_scale_patch_composition'
+                args: -1
+                mult_factor: 1.0
+            smoothness:
+                name: 'smoothness_loss'
+                args: None
+                mult_factor: 0.0
+            NPS:
+                name: 'NPS'
+                args: '/data01/f.nesti/data/SemanticSegmentation/printable_colors.txt'
+                mult_factor: 0.0
+        
+        
+        num_opt_samples: 250
+        opt_iters: 200
+        batch_size: 10
+
+        use_multiple_outputs: True    # Aux logits on/off
+
+        batch_size_val: 15
+        test_log: 10 # test_every
+        checkpoint_patch: 50   # save_every
+
+        opt_validation_log1: True   # online_validation
+        
+        # EOT
+        use_transformations: False
+
+    attr:
+        width : 600
+        height : 300
+        pos_x:
+        pos_y:
